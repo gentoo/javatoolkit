@@ -31,7 +31,7 @@ dist-javatoolkit:
 		sed "s/^VERSION=.*/VERSION=$(VERSION)/" | \
 		sed "s/^RELEASE_TAG=.*/RELEASE_TAG=$(RELEASE_TAG)/" \
 		> release/javatoolkit-$(VERSION)$(RELEASE_TAG)/makedefs.mak
-	( cd release ; tar zcf javatoolkit-$(VERSION)$(RELEASE_TAG).tar.gz javatoolkit-$(VERSION)$(RELEASE_TAG)/ )
+	( cd release ; tar jcf javatoolkit-$(VERSION)$(RELEASE_TAG).tar.bz2 javatoolkit-$(VERSION)$(RELEASE_TAG)/ )
 
 install: install-javatoolkit
 
@@ -47,3 +47,6 @@ install-javatoolkit:
 	for x in sun-fetch findclass bsfix buildparser javatoolkit ; do \
 		( cd src/$$x ; $(MAKE) DESTDIR=$(DESTDIR) install )  \
 	done
+
+upload:
+	scp release/javatoolkit-$(VERSION)$(RELEASE_TAG).tar.bz2 $(USER)@dev.gentoo.org:/space/distfiles-local/

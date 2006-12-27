@@ -6,7 +6,7 @@
 
 # Override this on command line when making a release, ie 'dist'
 
-VERSION=9.9.9
+VERSION=0.2.0
 RELEASE_TAG=
 PYVERSION="`python-config | sed 's/-l//' | sed 's/ -lm.*//'`"
 DESTDIR=
