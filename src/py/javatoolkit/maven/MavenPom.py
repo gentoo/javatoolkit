@@ -144,6 +144,7 @@ class MavenPom:
                             if "maven-compiler-plugin" ==  child_node.childNodes[0].data:
                                 node.parentNode.removeChild(node)
                                 node.unlink()
+				break
 
             # creation/overwrite part
             plugin_node = self.create_element(xmldoc,"plugin")
