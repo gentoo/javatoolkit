@@ -1,12 +1,16 @@
-# Copyright 2004-2007 Gentoo Foundation
+# Copyright 2004-2011 Gentoo Foundation
 # Distrubuted under the terms of the GNU General Public Licence v2
 
 # Authors:
 # koirky <kiorky@cryptelium.net> The code:
 # ali_bush <ali_bush@gentoo.org> Refactored into module.
+# Kasun Gajasinghe <kasunbg@gmail.com> improved pom rewrite feature
 # Python based POM navigator
 
 # Changelog
+# Kasun Gajasinghe <kasunbg@gmail.com>
+# 11/07/2011 Improved pom rewriting feature - plugin rewrite
+#
 # ali_bush <ali_bush@gentoo.org>
 # 31/12/07 Refacted by separating MavenPom into namespace
 #
@@ -34,7 +38,7 @@ class MavenPom:
         self.mydoc = None
         self.cli_options = cli_options
 
-
+        
     def getInfos(self,node):
         for child_node in node.childNodes:
             if child_node.nodeType == child_node.ELEMENT_NODE:
@@ -106,7 +110,7 @@ class MavenPom:
         # desactivate all dependencies
         dependencies_root = ( xmldoc.getElementsByTagName("dependencies") or [] )
         for node in dependencies_root:
-            copylist_child_Nodes =list(node.childNodes)
+            copylist_child_Nodes = list(node.childNodes)
             for child_node in copylist_child_Nodes:
                 node.removeChild(child_node)
                 child_node.unlink()
@@ -120,10 +124,10 @@ class MavenPom:
                     for classpath_element in self.cli_options.classpath[0].split(':'):
                         if classpath_element:
                             dependency_elem = xmldoc.createElement("dependency")
-                            dependency_elem.appendChild( self.create_element(xmldoc, "groupId", "sexy"))
+                            dependency_elem.appendChild( self.create_element(xmldoc, "groupId", "gentoo.group.id.tmp"))
                             dependency_elem.appendChild( self.create_element(xmldoc, "artifactId", "gentoo%d" % (i)))
                             dependency_elem.appendChild( self.create_element(xmldoc, "version", "666"))
-                            dependency_elem.appendChild( self.create_element(xmldoc, "scope", "system"))
+                            dependency_elem.appendChild( self.create_element(xmldoc, "scope", "system") )
                             dependency_elem.appendChild( self.create_element(xmldoc, "systemPath", classpath_element))
                             node.appendChild(dependency_elem)
                             i += 1
@@ -162,32 +166,45 @@ class MavenPom:
                 source_node = self.create_element(xmldoc,"source",self.cli_options.p_source[0])
                 configuration_node.appendChild(source_node)
 
+            #add maven-compiler-plugin with source and target versions set to plugins node
+            project_node = xmldoc.getElementsByTagName("project")[0]
+            build_node = self.element_exists(project_node, "build")
+            #no build node
+            if not build_node:
+                build_node = self.create_element(xmldoc,"build")
+                #append plugins node
+                build_node.appendChild( self.create_element(xmldoc,"plugins") )
+                project_node.appendChild(build_node)
+
+            #no plugins node under build_node
+            build_plugin_node = self.element_exists(build_node, "plugins")
+            if not build_plugin_node:
+                build_node.appendChild( self.create_element(xmldoc,"plugins") )
+                project_node.appendChild(build_node)             
+
             plugins_nodes = ( xmldoc.getElementsByTagName("plugins") or [] )
-            # no plugins node
+
+            # no plugins node - this is redundant?
             if len(plugins_nodes) < 1  :
-                plugins_node = self.create_element(xmldoc,"plugins") 
+                plugins_node = self.create_element(xmldoc,"plugins")
                 plugins_nodes.append(plugins_node)
                 
-                for plugins_node in plugins_nodes:
-                    # add our generated plugin node
-                    plugins_node.appendChild(plugin_node)
-
-                    # no build node
-                    build_nodes = ( xmldoc.getElementsByTagName("build") or [] )
-                    if len(build_nodes) < 1 : 
-                        build_node = self.create_element(xmldoc,"build")  
-                        build_nodes.append(build_node)
-                        # add build node to project_node
-                        project_nodes = ( xmldoc.getElementsByTagName("project") or [] ) 
-                        for project_node in project_nodes:
-                            project_node.appendChild(build_node)
-
-                    # add plugins structure to the build node
-                    for build_node in build_nodes:
-                        build_node.appendChild(plugins_node.cloneNode(deep=True))
+            for plugins_node in plugins_nodes:
+                # add our generated plugin node
+                #there'll be several plugins nodes in profiles and one directly under build and
+                #another under build#pluginManagement node
+                plugins_node.appendChild(plugin_node.cloneNode(deep=True))
 
         self.__write(xmldoc.toxml("utf-8"))
 
+    def element_exists(self,parent_node,element_name):
+        element = None
+        if element_name:
+            for child_node in parent_node.childNodes:
+                if child_node.nodeType == child_node.ELEMENT_NODE:
+                    if child_node.nodeName == element_name:
+                        return child_node            
+        return element
 
     def create_element(self,xmldoc,element_name,text_value=None):
         element = None
