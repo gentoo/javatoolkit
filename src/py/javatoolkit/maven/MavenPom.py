@@ -9,6 +9,9 @@
 
 # Changelog
 # Kasun Gajasinghe <kasunbg@gmail.com>
+# 07/08/2011 Add pom's parent-element rewrite feature
+#
+# Kasun Gajasinghe <kasunbg@gmail.com>
 # 11/07/2011 Improved pom rewriting feature - plugin rewrite
 #
 # ali_bush <ali_bush@gentoo.org>
@@ -104,36 +107,36 @@ class MavenPom:
     def read(self):
         return self.buffer.getvalue()
 
+    def parent_rewrite(self, xmldoc, **kwargs):
+    #rewrite the <parent> element in the poms with the values in self.cli_options.{p_parentgroup,p_parentartifact,p_parentversion}
+    #This rewriting is optional. Packager may only rewrite version of the parent element as well if he wishes.
+    #This does not touch the parent pom.
+        parent_elements = ( xmldoc.getElementsByTagName("parent") or [] )
+        if parent_elements:
+            parent_element = parent_elements[0]
+            if self.cli_options.p_parentgroup:
+                current_pgroup = parent_element.getElementsByTagName("groupId")[0]
+                parent_element.removeChild( current_pgroup )
+                current_pgroup.unlink()
+                parent_element.appendChild( self.create_element(xmldoc, "groupId", self.cli_options.p_parentgroup[0] ) )
+            if self.cli_options.p_parentartifact:
+                current_partifact = parent_element.getElementsByTagName("artifactId")[0]
+                parent_element.removeChild( current_partifact )
+                current_partifact.unlink()
+                parent_element.appendChild( self.create_element(xmldoc, "artifactId", self.cli_options.p_parentartifact[0] ) )
+            if self.cli_options.p_parentversion:
+                current_pversion = parent_element.getElementsByTagName("version")[0]
+                parent_element.removeChild( current_pversion )
+                current_pversion.unlink()
+                parent_element.appendChild( self.create_element(xmldoc, "version", self.cli_options.p_parentversion[0] ) )
+            #	else:
+            #		create parent element and map the parent to gentoo maven super pom. That contains all the plugin versions etc.
 
-    def parent_rewrite(self,xmldoc,**kwargs):
-	#rewrite the <parent> element in the poms with the values in self.cli_options.{p_parentgroup,p_parentartifact,p_parentversion}
-	#This rewriting is optional. Packager may only rewrite version of the parent element as well if he wishes.
-	#This does not touch the parent pom.
-    	parent_element = ( xmldoc.getElementsByTagName("parent") or [] )
-	if parent_element:
-		if self.cli_options.p_parentgroup:
-			current_pgroup = parent_element.getElementsByTagName("groupId")[0]
-			parent_element.removeChild( current_pgroup )
-			current_pgroup.unlink()
-			parent_element.appendChild( self.create_element(xmldoc, "groupId", self.cli_options.p_parentgroup) )
-		if self.cli_options.p_parentartifact:
-        	        current_partifact = parent_element.getElementsByTagName("artifactId")[0]
-			parent_element.removeChild( current_partifact )
-			current_partifact.unlink()
-			parent_element.appendChild( self.create_element(xmldoc, "artifactId", self.cli_options.p_parentartifact) )		
-		if self.cli_options.p_parentversion:
-        	        current_pversion = parent_element.getElementsByTagName("version")[0]
-			parent_element.removeChild( current_pversion )
-			current_pversion.unlink()
-			parent_element.appendChild( self.create_element(xmldoc, "version", self.cli_options.p_parentversion) )
-#	else:
-#		create parent element and map the parent to gentoo maven super pom. That contains all the plugin versions etc. 		
-
-    def rewrite(self,xmldoc,**kwargs):
-
-	if self.cli_options.p_rewrite_parent:
-	    	parent_rewrite(self.mydoc,**kwargs)
-
+    def rewrite(self, xmldoc, **kwargs):
+        #rewrite the parent element of all poms if set 
+        if self.cli_options.p_rewrite_parent:
+	    	self.parent_rewrite(xmldoc)
+            
         # desactivate all dependencies
         dependencies_root = ( xmldoc.getElementsByTagName("dependencies") or [] )
         for node in dependencies_root:
