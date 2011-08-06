@@ -115,6 +115,7 @@ class MavenPom:
                 node.removeChild(child_node)
                 child_node.unlink()
 
+        newline = xmldoc.createTextNode('\n')
         # add our classpath using system scope
         if self.cli_options.classpath:
             i=0
@@ -130,6 +131,7 @@ class MavenPom:
                             dependency_elem.appendChild( self.create_element(xmldoc, "scope", "system") )
                             dependency_elem.appendChild( self.create_element(xmldoc, "systemPath", classpath_element))
                             node.appendChild(dependency_elem)
+                            node.appendChild(newline.cloneNode(deep=True))
                             i += 1
 
         # overwrite source/target options if any

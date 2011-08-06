@@ -120,7 +120,7 @@ if __name__ == '__main__':
             error("Please specify only one pom at a time.")
 
     if options.p_rewrite:
-        valid_sources = ["1.4","1.5"]
+        valid_sources = ["1.4","1.5","1.6"]
         for source in valid_sources:
             if options.p_source:
                 if len(options.p_source) != 1:
