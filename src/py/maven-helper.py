@@ -36,7 +36,7 @@ if __name__ == '__main__':
     usage += "  %s [-a] [-v] [-g] [-d] [-f fic.xml]\n" % sys.argv[0]
     usage += "Or:\n"
     usage += "  %s --rewrite [--classpath some.jar:class.jar:path.jar] [--source JVM_VER ] |--target JVM_VER]\n" % sys.argv[0]
-    usage += "    JVM_VER ::= 1.4 || 1.5 "
+    usage += "    JVM_VER ::= 1.4 || 1.5 || 1.6"
     usage += "\n"
     usage += "If the -f parameter is not utilized, the script will read and\n"
     usage += "write to stdin and stdout respectively.  The use of quotes on\n"
@@ -104,6 +104,8 @@ if __name__ == '__main__':
         make_option ("-r", "--rewrite",  action="store_true", dest="p_rewrite", help="rewrite poms to use our classpath"),
         make_option ("-p", "--ischild",  action="store_true", dest="p_ischild", help="return true if this is a child pom"),
         make_option ("-v", "--version" , action="store_true", dest="p_version",  help="get artifact version."),
+
+        make_option ("-w", "--rewritesubmoduleppom" , action="store_true", dest="p_rewrite_parent",  help="rewrite the <parent> element of poms of all sub-modules"),
         make_option ("-x", "--pgroup" , action="append", dest="p_parentgroup",  help="set <parent> groupId"),
         make_option ("-y", "--partifact" , action="append", dest="p_parentartifact",  help="set <parent> artifactId"),
         make_option ("-z", "--pversion" , action="append", dest="p_parentversion",  help="set <parent> version"),

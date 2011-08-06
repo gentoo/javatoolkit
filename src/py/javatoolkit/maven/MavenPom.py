@@ -105,9 +105,10 @@ class MavenPom:
         return self.buffer.getvalue()
 
 
-    def rewrite(self,xmldoc,**kwargs):
-	#rewrite the <parent> with the values in self.cli_options.{p_parentgroup,p_parentartifact,p_parentversion}
-	#This rewriting is optional. Packager may only rewrite version if he wishes.
+    def parent_rewrite(self,xmldoc,**kwargs):
+	#rewrite the <parent> element in the poms with the values in self.cli_options.{p_parentgroup,p_parentartifact,p_parentversion}
+	#This rewriting is optional. Packager may only rewrite version of the parent element as well if he wishes.
+	#This does not touch the parent pom.
     	parent_element = ( xmldoc.getElementsByTagName("parent") or [] )
 	if parent_element:
 		if self.cli_options.p_parentgroup:
@@ -127,6 +128,11 @@ class MavenPom:
 			parent_element.appendChild( self.create_element(xmldoc, "version", self.cli_options.p_parentversion) )
 #	else:
 #		create parent element and map the parent to gentoo maven super pom. That contains all the plugin versions etc. 		
+
+    def rewrite(self,xmldoc,**kwargs):
+
+	if self.cli_options.p_rewrite_parent:
+	    	parent_rewrite(self.mydoc,**kwargs)
 
         # desactivate all dependencies
         dependencies_root = ( xmldoc.getElementsByTagName("dependencies") or [] )
