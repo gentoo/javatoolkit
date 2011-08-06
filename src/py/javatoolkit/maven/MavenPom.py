@@ -101,12 +101,33 @@ class MavenPom:
                     self.__write("%d:dep_artifact:%s\n" % (i,dependency.artifact) )
                     self.__write("%d:dep_version:%s\n" % (i,dependency.version) )
 
-
     def read(self):
         return self.buffer.getvalue()
 
 
     def rewrite(self,xmldoc,**kwargs):
+	#rewrite the <parent> with the values in self.cli_options.{p_parentgroup,p_parentartifact,p_parentversion}
+	#This rewriting is optional. Packager may only rewrite version if he wishes.
+    	parent_element = ( xmldoc.getElementsByTagName("parent") or [] )
+	if parent_element:
+		if self.cli_options.p_parentgroup:
+			current_pgroup = parent_element.getElementsByTagName("groupId")[0]
+			parent_element.removeChild( current_pgroup )
+			current_pgroup.unlink()
+			parent_element.appendChild( self.create_element(xmldoc, "groupId", self.cli_options.p_parentgroup) )
+		if self.cli_options.p_parentartifact:
+        	        current_partifact = parent_element.getElementsByTagName("artifactId")[0]
+			parent_element.removeChild( current_partifact )
+			current_partifact.unlink()
+			parent_element.appendChild( self.create_element(xmldoc, "artifactId", self.cli_options.p_parentartifact) )		
+		if self.cli_options.p_parentversion:
+        	        current_pversion = parent_element.getElementsByTagName("version")[0]
+			parent_element.removeChild( current_pversion )
+			current_pversion.unlink()
+			parent_element.appendChild( self.create_element(xmldoc, "version", self.cli_options.p_parentversion) )
+#	else:
+#		create parent element and map the parent to gentoo maven super pom. That contains all the plugin versions etc. 		
+
         # desactivate all dependencies
         dependencies_root = ( xmldoc.getElementsByTagName("dependencies") or [] )
         for node in dependencies_root:

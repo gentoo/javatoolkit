@@ -98,12 +98,15 @@ if __name__ == '__main__':
         make_option ("-c", "--classpath", action="append", dest="classpath", help="set classpath to use with maven."),
         make_option ("-s", "--source", action="append", dest="p_source", help="Java source version."),
         make_option ("-t", "--target", action="append", dest="p_target", help="Java target version."),
-        make_option ("-d", "--depependencies" , action="store_true", dest="p_dep",  help="get dependencies infos"),
+        make_option ("-d", "--dependencies" , action="store_true", dest="p_dep",  help="get dependencies infos"),
         make_option ("-f", "--file",     action="append",     dest="files",      help="Transform files instead of operating on stdout and stdin"),
         make_option ("-g", "--group"   , action="store_true", dest="p_group",    help="get artifact group."),
         make_option ("-r", "--rewrite",  action="store_true", dest="p_rewrite", help="rewrite poms to use our classpath"),
         make_option ("-p", "--ischild",  action="store_true", dest="p_ischild", help="return true if this is a child pom"),
         make_option ("-v", "--version" , action="store_true", dest="p_version",  help="get artifact version."),
+        make_option ("-x", "--pgroup" , action="append", dest="p_parentgroup",  help="set <parent> groupId"),
+        make_option ("-y", "--partifact" , action="append", dest="p_parentartifact",  help="set <parent> artifactId"),
+        make_option ("-z", "--pversion" , action="append", dest="p_parentversion",  help="set <parent> version"),
     ]
 
     parser = OptionParser(usage, options_list)
