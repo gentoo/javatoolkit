@@ -105,6 +105,7 @@ if __name__ == '__main__':
         make_option ("-p", "--ischild",  action="store_true", dest="p_ischild", help="return true if this is a child pom"),
         make_option ("-v", "--version" , action="store_true", dest="p_version",  help="get artifact version."),
 
+        make_option ("-u", "--superpomversion" , action="append", dest="p_superpom_version",  help="add gentoo-super-pom as the <parent> element if <parent> element is missing"),
         make_option ("-w", "--rewritesubmoduleppom" , action="store_true", dest="p_rewrite_parent",  help="rewrite the <parent> element of poms of all sub-modules"),
         make_option ("-x", "--pgroup" , action="append", dest="p_parentgroup",  help="set <parent> groupId"),
         make_option ("-y", "--partifact" , action="append", dest="p_parentartifact",  help="set <parent> artifactId"),

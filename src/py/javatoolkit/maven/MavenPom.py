@@ -137,6 +137,25 @@ class MavenPom:
         if self.cli_options.p_rewrite_parent:
 	    	self.parent_rewrite(xmldoc)
             
+	#append <parent> element to pom if it does not exist.
+	#If set p_rewrite_parent set, a <parent> will be _created_ or rewritten according to the given input.
+	#parent_rewrite takes precedence over this if set
+	parent_elements = ( xmldoc.getElementsByTagName("parent") or [] )
+	if not parent_elements:
+		project_node = xmldoc.getElementsByTagName("project")[0]		
+		parent_element =  self.create_element(xmldoc, "parent" )
+		
+		parent_element.appendChild( self.create_element(xmldoc, "groupId", "gentoo"))
+		parent_element.appendChild( self.create_element(xmldoc, "artifactId", "gentoo-superpom"))
+
+		#set superpom_version
+		superpom_version=1
+		#cmd argument
+		if self.cli_options.p_superpom_version:
+			superpom_version=self.cli_options.p_superpom_version
+		parent_element.appendChild( self.create_element(xmldoc, "version", "%s" % superpom_version ))
+		project_node.appendChild( parent_element  )
+
         # desactivate all dependencies
         dependencies_root = ( xmldoc.getElementsByTagName("dependencies") or [] )
         for node in dependencies_root:
