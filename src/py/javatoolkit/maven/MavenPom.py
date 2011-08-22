@@ -59,7 +59,9 @@ class MavenPom:
                         if child_node.nodeName == "name":
                             self.name = child_node.childNodes[0].nodeValue
 
-
+    #Reads the pom and prints the info to stdout
+    #Used for purposes such as determing the relevant location for the pom
+    #in the maven repo etc.
     def getDescription(self,mydoc,**kwargs):
         if mydoc:
             self.project = mydoc.getElementsByTagName("project")[0]
@@ -129,9 +131,19 @@ class MavenPom:
                 parent_element.removeChild( current_pversion )
                 current_pversion.unlink()
                 parent_element.appendChild( self.create_element(xmldoc, "version", self.cli_options.p_parentversion[0] ) )
-            #	else:
-            #		create parent element and map the parent to gentoo maven super pom. That contains all the plugin versions etc.
+	elif self.cli_options.p_parentgroup[0] and self.cli_options.p_parentartifact and self.cli_options.p_parentversion:
+	    project_node = xmldoc.getElementsByTagName("project")[0]
+	    parent_element =  self.create_element(xmldoc, "parent" )
 
+            parent_element.appendChild( self.create_element(xmldoc, "groupId", self.cli_options.p_parentgroup[0] ) )
+            parent_element.appendChild( self.create_element(xmldoc, "artifactId", self.cli_options.p_parentartifact[0] ) )
+            parent_element.appendChild( self.create_element(xmldoc, "version", self.cli_options.p_parentversion[0] ) )
+
+	    project_node.appendChild( parent_element  )
+
+
+    #rewrites the pom to match the Gentoo's needs.
+    #rewriting includes <parent> rewriting, <dependencies> rewriting, and adding source/target bits to m-compiler-p etc.
     def rewrite(self, xmldoc, **kwargs):
         #rewrite the parent element of all poms if set 
         if self.cli_options.p_rewrite_parent:
@@ -156,7 +168,7 @@ class MavenPom:
 		parent_element.appendChild( self.create_element(xmldoc, "version", "%s" % superpom_version ))
 		project_node.appendChild( parent_element  )
 
-        # desactivate all dependencies
+        # de-activate all dependencies
         dependencies_root = ( xmldoc.getElementsByTagName("dependencies") or [] )
         for node in dependencies_root:
             copylist_child_Nodes = list(node.childNodes)
@@ -257,6 +269,8 @@ class MavenPom:
                         return child_node            
         return element
 
+
+    #creates a xml dom node. If text_value is specifed, a text node is created.
     def create_element(self,xmldoc,element_name,text_value=None):
         element = None
         if element_name:
