@@ -2,11 +2,12 @@
 # -*- coding: UTF-8 -*-
 # vim: set ai ts=8 sts=0 sw=8 tw=0 noexpandtab:
 
-# Copyright 2004-2007 Gentoo Foundation
+# Copyright 2004-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public Licence v2
 
 # Authors:
 # kiorky <kiorky@cryptelium.net>:
+# Kasun Gajasinghe <kasunbg@gmail.com>
 # Maintainer: Gentoo Java Herd <java@gentoo.org>
 # Python based POM navigator
 
@@ -28,14 +29,14 @@ __version__ = "$Revision: 1.1 $"[11:-2]
 
 if __name__ == '__main__':
     usage = "XML MAVEN POM MODULE " + __version__ + "\n"
-    usage += "Copyright 2004,2006,2007 Gentoo Foundation\n"
+    usage += "Copyright 2004-2011 Gentoo Foundation\n"
     usage += "Distributed under the terms of the GNU General Public Lincense v2\n"
-    usage += "Please contact the Gentoo Java Team <java@gentoo.org> with problems.\n"
+    usage += "Please contact the Gentoo Java Team <java@gentoo.org> if you have any problem.\n"
     usage += "\n"
     usage += "Usage:\n"
     usage += "  %s [-a] [-v] [-g] [-d] [-f fic.xml]\n" % sys.argv[0]
     usage += "Or:\n"
-    usage += "  %s --rewrite [--classpath some.jar:class.jar:path.jar] [--source JVM_VER ] |--target JVM_VER]\n" % sys.argv[0]
+    usage += "  %s --rewrite [--classpath some.jar:class.jar:path.jar] [--source JVM_VER ] |--target JVM_VER] [--superpomversion] [-w] [-x] [-y] [-z] \n" % sys.argv[0]
     usage += "    JVM_VER ::= 1.4 || 1.5 || 1.6"
     usage += "\n"
     usage += "If the -f parameter is not utilized, the script will read and\n"
@@ -91,8 +92,11 @@ if __name__ == '__main__':
 
 ############### MAIN ###############
 
-
-
+    #-agv are informational items, and does not edit the pom file.
+    #-c the classpath created by JAVA_MAVEN_CLASSPATH in java-maven-2.eclass.
+    #-st adds needed java compiler and runtime versions to maven-compiler-plugin configuration in the pom
+    #-uwxyz arguments are related to <parent> node rewriting.
+    #Further details available in the 'help' attribute.
     options_list = [
         make_option ("-a", "--artifact", action="store_true", dest="p_artifact", help="get artifact name."),
         make_option ("-c", "--classpath", action="append", dest="classpath", help="set classpath to use with maven."),
@@ -142,7 +146,7 @@ if __name__ == '__main__':
                 if options.p_target[0] not in valid_sources:
                     error("Target %s is not valid" % options.p_target[0])
 
-        # join any classpathes if any
+        # join any classpaths if any
         if options.classpath:
             if len(options.classpath) > 1:
                 start =[]
