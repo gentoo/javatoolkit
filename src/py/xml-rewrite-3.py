@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 # Copyright 2004-2008 Gentoo Foundation
@@ -23,16 +23,18 @@
 #      December 23, 2004 - Initial Write
 #      December 24, 2004 - Added usage information
 
+
 import os
 import sys
-import StringIO
+import io
 from optparse import OptionParser, make_option
 from javatoolkit.xml.DomRewriter import DomRewriter
 from javatoolkit.xml.SaxRewriter import SaxRewriter
 
+
 __version__ = "$Revision: 1.7 $"[11:-2]
 
-if __name__ == '__main__':
+def main():
     usage = "XML Rewrite Python Module Version " + __version__ + "\n"
     usage += "Copyright 2004,2006,2007 Gentoo Foundation\n"
     usage += "Distributed under the terms of the GNU General Public Lincense v2\n"
@@ -61,7 +63,7 @@ if __name__ == '__main__':
     usage += "parameters will break the script.\n"
 
     def error(message):
-        print "ERROR: " + message
+        print("ERROR: " + message)
         sys.exit(1)
 
 
@@ -72,7 +74,7 @@ if __name__ == '__main__':
         else:
             rewriter.process(in_stream, **kwargs)
 
-        out = StringIO.StringIO()
+        out = io.StringIO()
         rewriter.write(out)
         return out.getvalue()
 
@@ -157,8 +159,8 @@ if __name__ == '__main__':
 
     # Invalid Arguments Must be smited!
     if not options.doAdd and not options.doDelete and not options.gentoo_classpath and not options.doJavadoc and not options.doMaven:
-        print usage
-        print
+        print(usage)
+        print()
         error("No action was specified.")
 
     if options.doAdd:
@@ -204,7 +206,7 @@ if __name__ == '__main__':
     # main loop
     if options.files:
         for file in options.files:
-            print "Rewriting %s" % file
+            print("Rewriting %s" % file)
             # First parse the file into memory
             # Tricks with cwd are needed for relative includes of other xml files to build.xml files
             cwd = os.getcwd()
@@ -225,4 +227,6 @@ if __name__ == '__main__':
         outxml = processActions(options, sys.stdin)
         sys.stdout.write(outxml)
 
-#set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap 
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright(c) 2006, 2008 James Le Cuirot <chewi@aura-online.co.uk>
 # Copyright(c) 2005, Karl Trygve Kalleberg <karltk@gentoo.org>
@@ -25,7 +25,6 @@ __description__ = "A parser for build.properties and JAR manifest files."
 
 
 def parse_args():
-
     usage = 'buildparser [options] [node name] [replacement] <filename>'
     about = __productname__ + " : " + __description__ + "\n" + \
         "Version : " + __version__ + "\n" \
@@ -60,7 +59,6 @@ def parse_args():
     return opt, args
 
 def main():
-
     opt, args = parse_args()
 
     f = open(args[-1])
@@ -111,18 +109,18 @@ def main():
 
         if n != None:
             if opt.wrap:
-                print p.wrapped_value(n)
+                print(p.wrapped_value(n))
             else:
-                print n.value
+                print(n.value)
 
     else:
         for x in t.node_names():
-            print x
+            print(x)
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print "Interrupted by user, aborting."
+        print("Interrupted by user, aborting.")
 
 #set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap
