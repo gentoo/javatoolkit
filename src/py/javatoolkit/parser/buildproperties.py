@@ -6,8 +6,8 @@
 #
 # $Header: $
 
-from tree import *
-import parser
+from .tree import *
+from . import parser
 
 class BuildPropertiesParser(parser.Parser):
 

@@ -17,7 +17,7 @@
 # 08/05/2007 initial version
 
 import sys
-import StringIO
+import io
 
 # either a very simplified representation of a maven pom
 # or a fully xml rewritten pom
@@ -29,7 +29,7 @@ class MavenPom:
         self.name = ''
         self.is_child = "false"
         self.dependencies = []
-        self.buffer = StringIO.StringIO()
+        self.buffer = io.StringIO()
         self.__write = self.buffer.write
         self.mydoc = None
         self.cli_options = cli_options
@@ -164,20 +164,19 @@ class MavenPom:
             plugins_nodes = ( xmldoc.getElementsByTagName("plugins") or [] )
             # no plugins node
             if len(plugins_nodes) < 1  :
-                plugins_node = self.create_element(xmldoc,"plugins") 
+                plugins_node = self.create_element(xmldoc,"plugins")
                 plugins_nodes.append(plugins_node)
-                
                 for plugins_node in plugins_nodes:
                     # add our generated plugin node
                     plugins_node.appendChild(plugin_node)
 
                     # no build node
                     build_nodes = ( xmldoc.getElementsByTagName("build") or [] )
-                    if len(build_nodes) < 1 : 
-                        build_node = self.create_element(xmldoc,"build")  
+                    if len(build_nodes) < 1 :
+                        build_node = self.create_element(xmldoc,"build")
                         build_nodes.append(build_node)
                         # add build node to project_node
-                        project_nodes = ( xmldoc.getElementsByTagName("project") or [] ) 
+                        project_nodes = ( xmldoc.getElementsByTagName("project") or [] )
                         for project_node in project_nodes:
                             project_node.appendChild(build_node)
 

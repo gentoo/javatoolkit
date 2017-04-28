@@ -3,24 +3,24 @@
 # Copyright(c) 2004, Gentoo Foundation
 #
 # Licensed under the GNU General Public License, v2
-#
-# $Header: $
-
 import sys
+
 
 class ParseError:
     def __init__(self, error):
         self.error = error
 
+
 class NodeIter:
     def __init__(self, node):
         self._node = node
         self._index = 0
-    def next(self):
+    def __next__(self):
         self._index += 1
         if self._index >= len(self._node._kids):
             raise StopIteration
         return self._node._kids[self._index]
+
 
 class Node:
     def __init__(self, name = None, value = None):

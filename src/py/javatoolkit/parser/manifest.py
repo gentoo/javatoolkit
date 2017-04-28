@@ -4,8 +4,8 @@
 #
 # $Header: $
 
-from tree import *
-import parser
+from .tree import *
+from . import parser
 
 class ManifestParser(parser.Parser):
 
@@ -54,7 +54,7 @@ class ManifestParser(parser.Parser):
 
     def output(self, ous, tree):
         tree.output(ous, "", ": ", "", ",", " ")
-    
+
     def wrapped_value(self, node):
         return node.output_value(",")
 

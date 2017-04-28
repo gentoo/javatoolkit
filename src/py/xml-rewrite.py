@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 # Copyright 2004 Gentoo Foundation
@@ -14,17 +14,19 @@
 #      December 23, 2004 - Initial Write
 #      December 24, 2004 - Added usage information
 
+
 import sys
 from xml.dom.minidom import parse
-
 from optparse import OptionParser, make_option
 from xml.dom import NotFoundErr
 
+
 __version__ = "$Revision: 1.6 $"[11:-2]
+
 
 class IOWrapper:
     def __init__(self, object):
-        self.stream = object 
+        self.stream = object
 
     def stream(self):
         return self.stream
@@ -37,6 +39,7 @@ class IOWrapper:
             file.write(data.encode('utf-8'))
             file.close()
 
+
 class Rewriter:
     def __init__(self, stream):
         self.stream = stream
@@ -46,7 +49,7 @@ class Rewriter:
         matches = self.document.getElementsByTagName(elementTag)
         if matches:
             if index == None:
-                for match in matches: 
+                for match in matches:
                     match.setAttribute(attribute, value)
             else:
                 matches[index].setAttribute(attribute, value)
@@ -70,7 +73,7 @@ class Rewriter:
         self.stream.write(self.document.toxml())
 
 
-if __name__ == '__main__':
+def main():
     usage = "XML Rewrite Python Module Version " + __version__ + "\n"
     usage += "Copyright 2004 Gentoo Foundation\n"
     usage += "Distributed under the terms of the GNU General Public Lincense v2\n"
@@ -86,14 +89,14 @@ if __name__ == '__main__':
 
 
     def error(message):
-        print "ERROR: " + message
+        print("ERROR: " + message)
         sys.exit(1)
 
 
 #    if len(sys.argv) == 1:
 #        usage(True)
 
-    options_list = [ 
+    options_list = [
         make_option ("-f", "--file", type="string", dest="file", help="Read input from file instead of stdin"),
         make_option ("-c", "--change", action="store_true", dest="doAdd", default=False, help="Change the value of an attribute.  If it does not exist, it will be created."),
         make_option ("-d", "--delete", action="store_true", dest="doDelete", default=False, help="Delete an attribute from matching elements."),
@@ -106,11 +109,10 @@ if __name__ == '__main__':
     parser = OptionParser(usage, options_list)
     (options, args) = parser.parse_args()
 
-
     # Invalid Arguments Must be smited!
     if not options.doAdd and not options.doDelete:
-        print usage
-        print
+        print(usage)
+        print()
         error("No action was specified.")
 
     if options.doAdd and options.doDelete:
@@ -123,20 +125,23 @@ if __name__ == '__main__':
         error("You must specify values for the attributes to be modified.")
     # End Invalid Arguments Check
 
-
     if options.file:
         source = options.file
     else:
         source = sys.stdin
 
     rewriter = Rewriter(IOWrapper(source))
-    
+
     if options.doDelete:
         for element in options.elements:
             rewriter.deleteAttribute(element, options.attribute, options.index)
-    
+
     if options.doAdd:
         for element in options.elements:
             rewriter.modifyAttribute(element, options.attribute, options.value, options.index)
 
     rewriter.write()
+
+
+if __name__ == '__main__':
+    main()

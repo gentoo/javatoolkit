@@ -1,14 +1,8 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright 2004-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
 
 from xml.dom import NotFoundErr
-#import os
-#import sys
-#import StringIO
-#import xml.sax.saxutils import quoteattr,escape
 
 class DomRewriter:
     """
@@ -16,7 +10,6 @@ class DomRewriter:
     be used for all the complex stuff but portage needed features should
     be in StreamRewriterBase subclasses as they are much faster.
     """
-    from xml.dom import NotFoundErr
     def __init__(self, modifyElems = None, attributes = None , values=None, index=None):
         self.modifyElems = modifyElems
         self.attributes = attributes
@@ -50,7 +43,7 @@ class DomRewriter:
 
 
     def add_gentoo_classpath(self,document,**kwargs):
-        if not kwargs.has_key('classpath') or not kwargs['classpath']:
+        if 'classpath' not in kwargs or not kwargs['classpath']:
             return
 
         cp = document.createElement("classpath")

@@ -3,9 +3,11 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-import os,sys
+import os
+import sys
 from struct import unpack
 from zipfile import ZipFile
+
 
 class cvv:
     def __init__(self, target):
@@ -22,26 +24,21 @@ class cvv:
     def do_class(self,filename):
         classFile = file(filename,"rb")
         classFile.seek(4)
-        
         temp = classFile.read(4)
-        #(version,) = unpack('>i',temp)
         (version,) = unpack('>xxh',temp)
-        version-=44
-
+        version -= 44
         self.add(version, None, filename)
-    
+
     def do_jar(self, filename):
         zipfile = ZipFile(filename, 'r')
-    
+
         for file in zipfile.namelist():
             if file.endswith('class'):
                 classFile = zipfile.read(file)
-                
                 (version,) = unpack('>h',classFile[6:8])
-                version-=44
-
+                version -= 44
                 self.add(version, filename, file)
-    
+
     def do_file(self, filename):
         if not os.path.islink(filename):
             if filename.endswith(".class"):

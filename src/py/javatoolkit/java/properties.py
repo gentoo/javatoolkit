@@ -1,8 +1,7 @@
 # Copyright 2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
-
 import os
+
 
 class PropertiesParser:
     """
@@ -25,7 +24,6 @@ class PropertiesParser:
         while line != '':
             line = line.strip('\n')
             line = line.strip()
-            #print 'line="'+line+'"'
             if line.isspace() or line == '' or line.startswith('#'):
                 line = stream.readline()
                 continue
@@ -35,14 +33,10 @@ class PropertiesParser:
             name = name.strip()
             value = line[index+1:]
 
-            #print 'name="'+name+'"; value="'+value+'"'
-
             while line.endswith('\\'):
-                #stream.next()
                 line = stream.readline()
                 line = line.strip('\n')
                 line = line.strip()
-                #print 'line="'+line+'"'
                 if line.isspace() or line == '' or line.startswith('#'):
                     line = stream.readline()
                     break

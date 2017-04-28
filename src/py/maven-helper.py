@@ -19,14 +19,16 @@
 
 
 import sys
-import StringIO
+import io
 from optparse import OptionParser, make_option
 from javatoolkit.maven.MavenPom import MavenPom
+
 
 __version__ = "$Revision: 1.1 $"[11:-2]
 
 
-if __name__ == '__main__':
+def main()
+
     usage = "XML MAVEN POM MODULE " + __version__ + "\n"
     usage += "Copyright 2004,2006,2007 Gentoo Foundation\n"
     usage += "Distributed under the terms of the GNU General Public Lincense v2\n"
@@ -44,7 +46,7 @@ if __name__ == '__main__':
 
 
     def error(message):
-        print "ERROR: " + message
+        print("ERROR: " + message)
         sys.exit(1)
 
 
@@ -54,7 +56,6 @@ if __name__ == '__main__':
             pom.parse(stream, pom.rewrite)
         elif options.p_ischild or options.p_group or options.p_dep or options.p_artifact or options.p_version:
             pom.parse(stream, pom.getDescription)
-
         return pom
 
 
@@ -78,21 +79,15 @@ if __name__ == '__main__':
                     f.write(pom.read())
                     f.close()
                 else:
-                    print "%s" % pom.read()
-
+                    print("%s" % pom.read())
                 os.chdir(cwd)
-
         else:
             # process stdin
             pom = doAction(sys.stdin.read(),options)
-            print pom.read()
-
+            print(pom.read())
 
 
 ############### MAIN ###############
-
-
-
     options_list = [
         make_option ("-a", "--artifact", action="store_true", dest="p_artifact", help="get artifact name."),
         make_option ("-c", "--classpath", action="append", dest="classpath", help="set classpath to use with maven."),
@@ -111,8 +106,8 @@ if __name__ == '__main__':
 
     # Invalid Arguments Must be smited!
     if not options.p_ischild and not options.p_rewrite and not options.p_dep and not options.p_version and not options.p_artifact and not options.p_group:
-        print usage
-        print
+        print(usage)
+        print()
         error("No action was specified.")
 
     if options.files:
@@ -125,14 +120,11 @@ if __name__ == '__main__':
             if options.p_source:
                 if len(options.p_source) != 1:
                     error("Please specify one and only one source.")
-
                 if options.p_source[0] not in valid_sources:
                     error("Source %s is not valid" % options.p_source[0])
-
             if options.p_target:
                 if len(options.p_target) != 1:
                     error("Please specify one and only one target.")
-
                 if options.p_target[0] not in valid_sources:
                     error("Target %s is not valid" % options.p_target[0])
 
@@ -143,11 +135,11 @@ if __name__ == '__main__':
                 start.append(options.classpath[0])
                 for item in options.classpath[1:]:
                     start[0] += ":%s" % (item)
-
                 options.classpath = start
 
     # End Invalid Arguments Check
     # main loop
     run()
 
-#set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap 
+if __name__ == '__main__':
+    main()

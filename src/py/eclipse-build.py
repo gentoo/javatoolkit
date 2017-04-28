@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 # Copyright 2008 Gentoo Foundation
@@ -17,13 +17,13 @@ from javatoolkit.java.properties import PropertiesParser
 
 __version__ = "$Revision: 1 $"[11:-2]
 
+
 if __name__ == '__main__':
     usage = "Eclipse Ant Build File writer " + __version__ + "\n"
     usage += "Copyright 2008 Gentoo Foundation\n"
     usage += "Distributed under the terms of the GNU General Public Licence\n"
     usage += "Please contact the Gentoo Java Team <java@gentoo.org> with problems.\n"
     usage += "\nJust wait till I finish this."
-
 
     option_list = [
         make_option ( '-p', '--project', action='store', dest='project', help='Project Name' ),
