@@ -6,7 +6,7 @@
 
 import os
 import sys
-import StringIO
+import io
 
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.saxutils import quoteattr
@@ -17,33 +17,33 @@ class SaxRewriter(XMLGenerator):
     and is only marginally slower than expat as it is just a tight layer over it
     """
     def __init__(self, **kwds):
-        self.elems = kwds.has_key('elems') and kwds['elems'] or []
-        self.attributes = kwds.has_key('attributes') and kwds['attributes'] or []
-        self.values = kwds.has_key('values') and kwds['values'] or []
-        self.sourceElems = kwds.has_key('sourceElems') and kwds['sourceElems'] or []
-        self.sourceAttributes = kwds.has_key('sourceAttributes') and kwds['sourceAttributes'] or []
-        self.sourceValues = kwds.has_key('sourceValues') and kwds['sourceValues'] or []
-        self.targetElems = kwds.has_key('targetElems') and kwds['targetElems'] or []
-        self.targetAttributes = kwds.has_key('targetAttributes') and kwds['targetAttributes'] or []
-        self.targetValues = kwds.has_key('targetValues') and kwds['targetValues'] or []
+        self.elems = 'elems' in kwds and kwds['elems'] or []
+        self.attributes = 'attributes' in kwds and kwds['attributes'] or []
+        self.values = 'values' in kwds and kwds['values'] or []
+        self.sourceElems = 'sourceElems' in kwds and kwds['sourceElems'] or []
+        self.sourceAttributes = 'sourceAttributes' in kwds and kwds['sourceAttributes'] or []
+        self.sourceValues = 'sourceValues' in kwds and kwds['sourceValues'] or []
+        self.targetElems = 'targetElems' in kwds and kwds['targetElems'] or []
+        self.targetAttributes = 'targetAttributes' in kwds and kwds['targetAttributes'] or []
+        self.targetValues = 'targetValues' in kwds and kwds['targetValues'] or []
 
-        self.deleteElems = kwds.has_key('deleteElems') and kwds['deleteElems'] or []
-        self.deleteAttributes = kwds.has_key('deleteAttributes') and kwds['deleteAttributes'] or []
+        self.deleteElems = 'deleteElems' in kwds and kwds['deleteElems'] or []
+        self.deleteAttributes = 'deleteAttributes' in kwds and kwds['deleteAttributes'] or []
 
-        self.src_dirs = kwds.has_key('src_dirs') and kwds['src_dirs'] or []
-        self.output_dir = kwds.has_key('output_dir') and kwds['output_dir'] or None
+        self.src_dirs = 'src_dirs' in kwds and kwds['src_dirs'] or []
+        self.output_dir = 'output_dir' in kwds and kwds['output_dir'] or None
 
-        self.buffer = StringIO.StringIO()
+        self.buffer = io.StringIO()
 
         XMLGenerator.__init__(self, self.buffer, 'UTF-8')
 
 
     def add_gentoo_javadoc(self, name, attrs):
-        self.p(u'<%s ' % name)
-        for a,v in attrs.items():
+        self.p('<%s ' % name)
+        for a,v in list(attrs.items()):
             self.write_attr(a,v)
 
-        self.p(u'>')
+        self.p('>')
 
         if name == "project":
             javadoc_str = """
@@ -69,20 +69,20 @@ class SaxRewriter(XMLGenerator):
             </target>
             """
 
-            self.p(u'%s' % javadoc_str)
+            self.p('%s' % javadoc_str)
 
 
     # write as they are or delete if wanted attributes first
     # next, add / update
     def modify_elements(self, name, attrs):
-        self.p(u'<%s ' % name)
+        self.p('<%s ' % name)
 
         match = ( name in self.elems )
         matchSource = ( name in self.sourceElems )
         matchTarget = ( name in self.targetElems )
         matchDelete = ( name in self.deleteElems )
 
-        for a,v in attrs.items():
+        for a,v in list(attrs.items()):
             if not (
                 (match and a in self.attributes)
                 or (matchSource and a in self.sourceAttributes)
@@ -103,7 +103,7 @@ class SaxRewriter(XMLGenerator):
             for i, attr in enumerate(self.attributes):
                 self.write_attr(attr, self.values[i])
 
-        self.p(u'>')
+        self.p('>')
 
 
     def char_data(self, data):
@@ -121,13 +121,13 @@ class SaxRewriter(XMLGenerator):
 
 
     def write_attr(self,a,v):
-        self.p(u'%s=%s ' % (a,quoteattr(v, {u'©':'&#169;'})))
+        self.p('%s=%s ' % (a,quoteattr(v, {'©':'&#169;'})))
 
 
     def process(self, in_stream, callback):
         self.startElement = callback
         from xml.sax import parseString
         parseString(in_stream, self)
-        self.p(u'\n')
+        self.p('\n')
 
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:
