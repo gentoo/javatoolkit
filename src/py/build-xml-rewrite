@@ -35,12 +35,12 @@ def main():
         if os.path.getsize(file) == 0 : continue
         tree = et.ElementTree(file=file)
         if gcp or options.encoding:
-            for javac in tree.getiterator('javac'):
+            for javac in tree.iter('javac'):
                 if gcp:
                     javac.attrib['classpath'] = gcp_str
                 if options.encoding:
                     javac.attrib['encoding'] = options.encoding
-                for javadoc in tree.getiterator('javadoc'):
+                for javadoc in tree.iter('javadoc'):
                     if gcp:
                         javadoc.attrib['classpath'] = gcp_str
                         if options.encoding:
@@ -48,9 +48,9 @@ def main():
         for c in changes:
             elems, attr, value = c
             for elem in elems:
-                for e in tree.getiterator(elem):
+                for e in tree.iter(elem):
                     e.attrib[attr] = value
-        for junit in tree.getiterator('junit'):
+        for junit in tree.iter('junit'):
             if gcp:
                 junit.append(gcp_sub)
                 junit.attrib['haltonfailure'] = 'true'
