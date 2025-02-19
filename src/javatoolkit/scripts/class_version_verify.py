@@ -6,10 +6,10 @@
 import os
 import sys
 from optparse import OptionParser, make_option
-from ..cvv import CVVMagic
+from .. import cvv
 
 
-def main():
+def main() -> None:
     options_list = [
         make_option(
             "-r",
@@ -30,7 +30,7 @@ def main():
             action="store_true",
             dest="verbose",
             default=False,
-            help="Print version of every class"),
+            help="Print details about analyzed files"),
         make_option(
             "-s",
             "--silent",
@@ -56,40 +56,90 @@ def main():
         print("-t is mandatory")
         sys.exit(2)
 
-    cvv_magic = CVVMagic(options.version)
+    cvv_magic = cvv.CVVMagic(options.version)
 
     for arg in args:
         if os.path.isfile(arg):
-            cvv_magic.do_file(arg)
+            cvv_magic.do(arg)
 
         if options.deep and os.path.isdir(arg):
             for root, dirs, files in os.walk(arg):
                 for filename in files:
-                    cvv_magic.do_file("%s/%s" % (root, filename))
+                    cvv_magic.do("%s/%s" % (root, filename))
 
     if options.file_only:
-        lst = set([set[1] for set in cvv_magic.bad])
+        lst = set()
+        for info in cvv_magic.bad:
+            match info.loc:
+                case cvv.FileLoc(path) | cvv.JarLoc(cvv.FileLoc(path), _):
+                    lst.add(path)
         for i in lst:
             print(i)
     else:
         if options.verbose:
-            for set in cvv_magic.good:
-                print("Good: %s %s %s" % set)
+            for good in cvv_magic.good:
+                print(__format_good(good))
 
         if not options.silent:
-            for set in cvv_magic.bad:
-                print("Bad: %s %s %s" % set)
-            for set in cvv_magic.skipped:
-                print("Skipped: %s %s %s" % set)
+            for bad in cvv_magic.bad:
+                print(__format_bad(bad))
+            for skipped in cvv_magic.skipped:
+                print(__format_skipped(skipped))
 
-        print("CVV: %s\nChecked: %i Good: %i Bad: %i Skipped: %i" %
-              (options.version, len(cvv_magic.good) + len(cvv_magic.bad) + len(cvv_magic.skipped),
-              len(cvv_magic.good), len(cvv_magic.bad), len(cvv_magic.skipped)))
+        print(f'CVV: {options.version}')
+        print(__get_total_line(cvv_magic))
 
     if len(cvv_magic.bad) > 0:
         sys.exit(1)
     else:
         sys.exit(0)
+
+
+def __get_total_line(cvv_magic: cvv.CVVMagic) -> str:
+    good = len(cvv_magic.good)
+    bad = len(cvv_magic.bad)
+    skipped = len(cvv_magic.skipped)
+    total = good + bad + skipped
+    return f'Checked: {total} Good: {good} Bad: {bad} Skipped: {skipped}'
+
+
+def __format_class(class_file: cvv.ClassFile) -> str:
+    return f'{class_file.encoded_version} {__format_loc(class_file.loc)}'
+
+
+def __format_skipped(f: cvv.SkippedFile) -> str:
+    msg: str
+    match f:
+        case cvv.SkippedModuleInfo() as cf:
+            msg = __format_class(cf)
+        case cvv.SkippedVersionDir(loc, reason):
+            msg = f'{__format_loc(loc)} because "{reason}"'
+    return f'Skipped: {msg}'
+
+
+def __format_bad(f: cvv.BadFile) -> str:
+    msg: str
+    match f:
+        case cvv.ClassFile():
+            msg = f'{__format_class(f)}'
+        case cvv.BadMultireleaseManifest(loc, multiReleaseDirs):
+            plain_dirs = [d.member for d in multiReleaseDirs]
+            msg = f'{__format_loc(loc)} missing "Multi-Release: true" for {plain_dirs}'
+        case cvv.MissingManifest(jar):
+            msg = f'{jar.path} missing META-INF/MANIFEST.MF'
+    return f'Bad: {msg}'
+
+
+def __format_good(f: cvv.GoodFile) -> str:
+    return f'Good: {f.encoded_version} {__format_loc(f.loc)}'
+
+
+def __format_loc(loc: cvv.Loc) -> str:
+    match loc:
+        case cvv.FileLoc(path):
+            return f'None {path}'
+        case cvv.JarLoc(jar, member):
+            return f'{jar.path} {member}'
 
 
 if __name__ == '__main__':
