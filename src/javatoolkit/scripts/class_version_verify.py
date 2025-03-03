@@ -39,6 +39,12 @@ def main() -> None:
             default=False,
             help="No output"),
         make_option(
+            "--detailed-output",
+            action="store_true",
+            dest="detailed_output",
+            default=False,
+            help="Include more details in messages"),
+        make_option(
             "-f",
             "--file-only",
             action="store_true",
@@ -76,15 +82,21 @@ def main() -> None:
         for i in lst:
             print(i)
     else:
+        formatter: Formatter
+        if options.detailed_output:
+            formatter = FormatterV2()
+        else:
+            formatter = FormatterV1()
+
         if options.verbose:
             for good in cvv_magic.good:
-                print(__format_good(good))
+                print(formatter.format_good(good))
 
         if not options.silent:
             for bad in cvv_magic.bad:
-                print(__format_bad(bad))
+                print(formatter.format_bad(bad))
             for skipped in cvv_magic.skipped:
-                print(__format_skipped(skipped))
+                print(formatter.format_skip(skipped))
 
         print(f'CVV: {options.version}')
         print(__get_total_line(cvv_magic))
@@ -95,49 +107,85 @@ def main() -> None:
         sys.exit(0)
 
 
+class Formatter:
+    def format_good(self, good_file: cvv.GoodFile) -> str:
+        raise NotImplementedError()
+
+    def format_bad(self, good_file: cvv.BadFile) -> str:
+        raise NotImplementedError()
+
+    def format_skip(self, good_file: cvv.SkippedFile) -> str:
+        raise NotImplementedError()
+
+class FormatterV1(Formatter):
+    def format_good(self, f: cvv.GoodFile) -> str:
+        return f'Good: {self.__format_class(f)}'
+
+    def format_bad(self, f: cvv.BadFile) -> str:
+        msg: str
+        match f:
+            case cvv.ClassFile():
+                msg = f'{self.__format_class(f)}'
+            case cvv.BadMultireleaseManifest(loc, multiReleaseDirs):
+                plain_dirs = [d.member for d in multiReleaseDirs]
+                msg = f'{self.__format_loc(loc)} missing "Multi-Release: true" for {plain_dirs}'
+        return f'Bad: {msg}'
+
+    def format_skip(self, f: cvv.SkippedFile) -> str:
+        msg: str
+        match f:
+            case cvv.SkippedModuleInfo() as cf:
+                msg = self.__format_class(cf)
+            case cvv.SkippedVersionDir(loc, reason):
+                msg = f'{self.__format_loc(loc)} because "{reason}"'
+        return f'Skipped: {msg}'
+
+
+    def __format_loc(self, loc: cvv.Loc) -> str:
+        match loc:
+            case cvv.FileLoc(path):
+                return f'None {path}'
+            case cvv.JarLoc(jar, member):
+                return f'{jar.path} {member}'
+
+    def __format_class(self, class_file: cvv.ClassFile) -> str:
+        return f'{class_file.encoded_version} {self.__format_loc(class_file.loc)}'
+
+
+class FormatterV2(Formatter):
+    def format_good(self, f: cvv.GoodFile) -> str:
+        return f'Good: {self.__format_class(f)}'
+
+    def format_bad(self, f: cvv.BadFile) -> str:
+        msg: str
+        match f:
+            case cvv.ClassFile():
+                msg = f'{self.__format_class(f)}'
+            case cvv.BadMultireleaseManifest(loc, multiReleaseDirs):
+                plain_dirs = [d.member for d in multiReleaseDirs]
+                msg = f'{self.__format_loc(loc)} missing "Multi-Release: true" implied by {plain_dirs}'
+        return f'Bad:  {msg}'
+
+    def format_skip(self, f: cvv.SkippedFile) -> str:
+        return f'Skip: {self.__format_loc(f.loc)} because: {f.reason}'
+
+    def __format_loc(self, loc: cvv.Loc) -> str:
+        match loc:
+            case cvv.FileLoc(path):
+                return f'{path}'
+            case cvv.JarLoc(jar, member):
+                return f'{jar.path}({member})'
+
+    def __format_class(self, cf: cvv.ClassFile) -> str:
+        return f'{self.__format_loc(cf.loc)} version {cf.encoded_version} (expected {cf.expected_version})'
+
+
 def __get_total_line(cvv_magic: cvv.CVVMagic) -> str:
     good = len(cvv_magic.good)
     bad = len(cvv_magic.bad)
     skipped = len(cvv_magic.skipped)
     total = good + bad + skipped
     return f'Checked: {total} Good: {good} Bad: {bad} Skipped: {skipped}'
-
-
-def __format_class(class_file: cvv.ClassFile) -> str:
-    return f'{class_file.encoded_version} {__format_loc(class_file.loc)}'
-
-
-def __format_skipped(f: cvv.SkippedFile) -> str:
-    msg: str
-    match f:
-        case cvv.SkippedModuleInfo() as cf:
-            msg = __format_class(cf)
-        case cvv.SkippedVersionDir(loc, reason):
-            msg = f'{__format_loc(loc)} because "{reason}"'
-    return f'Skipped: {msg}'
-
-
-def __format_bad(f: cvv.BadFile) -> str:
-    msg: str
-    match f:
-        case cvv.ClassFile():
-            msg = f'{__format_class(f)}'
-        case cvv.BadMultireleaseManifest(loc, multiReleaseDirs):
-            plain_dirs = [d.member for d in multiReleaseDirs]
-            msg = f'{__format_loc(loc)} missing "Multi-Release: true" for {plain_dirs}'
-    return f'Bad: {msg}'
-
-
-def __format_good(f: cvv.GoodFile) -> str:
-    return f'Good: {__format_class(f)}'
-
-
-def __format_loc(loc: cvv.Loc) -> str:
-    match loc:
-        case cvv.FileLoc(path):
-            return f'None {path}'
-        case cvv.JarLoc(jar, member):
-            return f'{jar.path} {member}'
 
 
 if __name__ == '__main__':
