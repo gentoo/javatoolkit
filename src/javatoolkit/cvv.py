@@ -46,7 +46,8 @@ class SkippedVersionDir:
 
 
 @dataclass
-class SkippedModuleInfo(ClassFile):
+class SkippedModuleInfo:
+    loc: Loc
     reason: str = 'A module-info requires java release >= 9'
 
 
@@ -70,15 +71,14 @@ class CVVMagic:
         if target_version is None:
             target_version = self.target
 
+        if CVVMagic.__is_module_info(loc) and target_version < 9:
+            self.__on_skipped(SkippedModuleInfo(loc))
+            return
+
         cf = ClassFile(
             loc,
             encoded_version=self.__format_version(version),
             expected_version=self.__format_version(target_version))
-
-        if CVVMagic.__is_module_info(loc) and target_version < 9:
-            self.__on_skipped(SkippedModuleInfo(
-                cf.loc, cf.encoded_version, cf.expected_version))
-            return
 
         if version <= target_version:
             self.__on_good(cf)

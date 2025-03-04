@@ -88,9 +88,6 @@ class SimpleTest(TestCase):
                 loc=jar_loc(path)
             )
 
-        def make_skip(path: str, ver: str) -> cvv.SkippedModuleInfo:
-            return cvv.SkippedModuleInfo(jar_loc(path), ver, '1.8')
-
         self.assertListEqual(my_sort(m.good), [
             make_class('Main.class', '1.8'),
         ])
@@ -98,7 +95,7 @@ class SimpleTest(TestCase):
             make_class('my/deep/module/Foo.class', '10'),
         ])
         self.assertListEqual(my_sort(m.skipped), [
-            make_skip('module-info.class', '9'),
+            cvv.SkippedModuleInfo(jar_loc('module-info.class')),
         ])
 
     def test_multirelease_jar(self) -> None:
