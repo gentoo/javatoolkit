@@ -1,4 +1,5 @@
 0.6.8 (???)
+- Change output format
 - Add tests
 - Support Multi-Release jars, bug #900767
 - Migrate build-system to flit with pyproject.toml
