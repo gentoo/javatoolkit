@@ -4,6 +4,7 @@ import javatoolkit.cvv as cvv
 from zipfile import ZipFile
 import struct
 import typing as T
+import os
 
 
 def create_class_header(version: int) -> bytes:
@@ -208,6 +209,29 @@ class SimpleTest(TestCase):
         m.do_jar(jar, jar_path)
         self.assertListEqual(m.good, [
             cvv.ClassFile(cvv.JarLoc(jar_path, 'module-info.class'), '10', '10'),
+        ])
+        self.assertListEqual(m.bad, [])
+        self.assertListEqual(m.skipped, [])
+
+    def test_maven_generated_manifest(self):
+        m = cvv.CVVMagic('10')
+        jar_path = cvv.FileLoc('a.jar')
+
+        jar = ZipFile(io.BytesIO(), 'w')
+        jar.writestr('A.class', create_class_header(10))
+        jar.writestr('META-INF/versions/12/A.class', create_class_header(12))
+        this_dir = os.path.dirname(os.path.realpath(__file__))
+        with open(f'{this_dir}/res/maven-generated-manifest.mf', 'rb') as f:
+            jar.writestr('META-INF/MANIFEST.MF', f.read())
+
+        m.do_jar(jar, jar_path)
+
+        def jar_member(member: str) -> cvv.JarLoc:
+            return cvv.JarLoc(jar_path, member)
+
+        self.assertListEqual(m.good, [
+            cvv.GoodFile(jar_member('A.class'), '10', '10'),
+            cvv.GoodFile(jar_member('META-INF/versions/12/A.class'), '12', '12'),
         ])
         self.assertListEqual(m.bad, [])
         self.assertListEqual(m.skipped, [])
