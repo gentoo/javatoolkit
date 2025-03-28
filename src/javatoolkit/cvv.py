@@ -100,7 +100,12 @@ class CVVMagic:
             pass
         else:
             with manifest:
-                lines = [line.decode('utf-8').rstrip() for line in manifest.readlines()]
+                def decode_line(line: bytes) -> str:
+                    # The Manifest spec requires that the file is utf-8 encoded.
+                    # Unfortunately, stuff like the maven-jar-plugin can generate
+                    # an invalid manifest when it blindly copies the author name
+                    return line.decode('utf-8', 'replace').rstrip('\r\n')
+                lines = [decode_line(line) for line in manifest.readlines()]
                 is_multirelease = 'Multi-Release: true' in lines
 
         invalid_version_dirs: set[str] = set()

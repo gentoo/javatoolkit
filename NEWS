@@ -1,3 +1,6 @@
+0.6.9 (??)
+- Prevent failure when MANIFEST.MF isn't UTF-8 encoded (bug #952052)
+
 0.6.8 (08 Mar 2025)
 - Change output format
 - Add tests
