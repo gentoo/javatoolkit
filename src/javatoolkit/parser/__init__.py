@@ -9,4 +9,4 @@ from .helpers import *
 from . import buildproperties
 
 if __name__ == "__main__":
-	print("This is not an executable module")
+    print("This is not an executable module")

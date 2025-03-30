@@ -4,10 +4,11 @@
 from .tree import *
 from . import parser
 
+
 class ManifestParser(parser.Parser):
 
     def parse(self, ins):
-        """ Parse an input stream containing a MANIFEST.MF file. Return a
+        """Parse an input stream containing a MANIFEST.MF file. Return a
         structured document represented by tree.Node
 
         @param ins - input stream
@@ -36,7 +37,7 @@ class ManifestParser(parser.Parser):
 
             if len(xs) > 1:
                 if attrib != "":
-                    root.add_kid(Node(attrib,value))
+                    root.add_kid(Node(attrib, value))
 
                 attrib = xs[0]
                 value = xs[1].strip()
@@ -45,7 +46,7 @@ class ManifestParser(parser.Parser):
                 raise ParseError("Malformed line " + str(lineno))
 
         if attrib != "":
-            root.add_kid(Node(attrib,value))
+            root.add_kid(Node(attrib, value))
 
         return root
 
@@ -54,5 +55,3 @@ class ManifestParser(parser.Parser):
 
     def wrapped_value(self, node):
         return node.output_value(",")
-
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:

@@ -14,33 +14,58 @@ from ..parser.buildproperties import BuildPropertiesParser
 from ..parser.manifest import ManifestParser
 from ..parser.tree import Node, ParseError
 
-__author__ = ["James Le Cuirot <chewi@aura-online.co.uk>",
-              "Karl Trygve Kalleberg <karltk@gentoo.org>"]
+__author__ = [
+    "James Le Cuirot <chewi@aura-online.co.uk>",
+    "Karl Trygve Kalleberg <karltk@gentoo.org>",
+]
 __version__ = "0.3.0"
 __productname__ = "buildparser"
 __description__ = "A parser for build.properties and JAR manifest files."
 
 
 def parse_args():
-    usage = 'buildparser [options] [node name] [replacement] <filename>'
-    about = __productname__ + " : " + __description__ + "\n" + \
-        "Version : " + __version__ + "\n" \
+    usage = "buildparser [options] [node name] [replacement] <filename>"
+    about = (
+        __productname__
+        + " : "
+        + __description__
+        + "\n"
+        + "Version : "
+        + __version__
+        + "\n"
         "Authors : " + __author__[0]
+    )
 
     for x in __author__[1:]:
         about += "\n          " + x
 
     parser = OptionParser(usage, version=about)
 
-    parser.add_option('-t', '--type', action='store', type='choice',
-                      dest='type', choices=['manifest', 'buildprops'],
-                      help='Type of file to parse: manifest or buildprops')
+    parser.add_option(
+        "-t",
+        "--type",
+        action="store",
+        type="choice",
+        dest="type",
+        choices=["manifest", "buildprops"],
+        help="Type of file to parse: manifest or buildprops",
+    )
 
-    parser.add_option('-i', '--in-place', action='store_true', dest='in_place',
-                      help='Edit file in place when replacing')
+    parser.add_option(
+        "-i",
+        "--in-place",
+        action="store_true",
+        dest="in_place",
+        help="Edit file in place when replacing",
+    )
 
-    parser.add_option('-w', '--wrap', action='store_true', dest='wrap',
-                      help='Wrap when returning singular values')
+    parser.add_option(
+        "-w",
+        "--wrap",
+        action="store_true",
+        dest="wrap",
+        help="Wrap when returning singular values",
+    )
 
     opt, args = parser.parse_args()
 
@@ -79,8 +104,9 @@ def main():
 
         else:
             sys.exit(
-                __productname__ +
-                ": error: Unknown file type. Specify using the -t option.")
+                __productname__
+                + ": error: Unknown file type. Specify using the -t option."
+            )
 
         t = p.parse(f)
         f.close()
@@ -118,10 +144,8 @@ def main():
             print(x)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
         print("Interrupted by user, aborting.")
-
-# set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap

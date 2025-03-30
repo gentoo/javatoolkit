@@ -17,39 +17,44 @@ def main() -> None:
             action="store_true",
             dest="deep",
             default=False,
-            help="go into dirs"),
+            help="go into dirs",
+        ),
         make_option(
             "-t",
             "--target",
             type="string",
             dest="version",
-            help="target version that is valid"),
+            help="target version that is valid",
+        ),
         make_option(
             "-v",
             "--verbose",
             action="store_true",
             dest="verbose",
             default=False,
-            help="Print details about analyzed files"),
+            help="Print details about analyzed files",
+        ),
         make_option(
             "-s",
             "--silent",
             action="store_true",
             dest="silent",
             default=False,
-            help="No output"),
+            help="No output",
+        ),
         make_option(
             "-f",
             "--file-only",
             action="store_true",
             dest="file_only",
             default=False,
-            help="Only output the files"),
+            help="Only output the files",
+        ),
     ]
 
     parser = OptionParser(
-        "%prog -t version [-r] [-v] [-s] <class/jar files or dir>",
-        options_list)
+        "%prog -t version [-r] [-v] [-s] <class/jar files or dir>", options_list
+    )
     (options, args) = parser.parse_args()
 
     if not options.version:
@@ -86,7 +91,7 @@ def main() -> None:
             for skipped in cvv_magic.skipped:
                 print(__format_skipped(skipped))
 
-        print(f'CVV: {options.version}')
+        print(f"CVV: {options.version}")
         print(__get_total_line(cvv_magic))
 
     if len(cvv_magic.bad) > 0:
@@ -100,39 +105,39 @@ def __get_total_line(cvv_magic: cvv.CVVMagic) -> str:
     bad = len(cvv_magic.bad)
     skipped = len(cvv_magic.skipped)
     total = good + bad + skipped
-    return f'Checked: {total} Good: {good} Bad: {bad} Skipped: {skipped}'
+    return f"Checked: {total} Good: {good} Bad: {bad} Skipped: {skipped}"
 
 
 def __format_class(cf: cvv.ClassFile) -> str:
-    return f'{__format_loc(cf.loc)} version {cf.encoded_version} (expected {cf.expected_version})'
+    return f"{__format_loc(cf.loc)} version {cf.encoded_version} (expected {cf.expected_version})"
 
 
 def __format_skipped(f: cvv.SkippedFile) -> str:
-    return f'Skip: {__format_loc(f.loc)} because: {f.reason}'
+    return f"Skip: {__format_loc(f.loc)} because: {f.reason}"
 
 
 def __format_bad(f: cvv.BadFile) -> str:
     msg: str
     match f:
         case cvv.ClassFile():
-            msg = f'{__format_class(f)}'
+            msg = f"{__format_class(f)}"
         case cvv.BadMultireleaseManifest(loc, multiReleaseDirs):
             plain_dirs = [d.member for d in multiReleaseDirs]
             msg = f'{__format_loc(loc)} missing "Multi-Release: true" implied by {plain_dirs}'
-    return f'Bad:  {msg}'
+    return f"Bad:  {msg}"
 
 
 def __format_good(f: cvv.GoodFile) -> str:
-    return f'Good: {__format_class(f)}'
+    return f"Good: {__format_class(f)}"
 
 
 def __format_loc(loc: cvv.Loc) -> str:
     match loc:
         case cvv.FileLoc(path):
-            return f'{path}'
+            return f"{path}"
         case cvv.JarLoc(jar, member):
-            return f'{jar.path}({member})'
+            return f"{jar.path}({member})"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

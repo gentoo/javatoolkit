@@ -7,10 +7,11 @@
 from .tree import *
 from . import parser
 
+
 class BuildPropertiesParser(parser.Parser):
 
     def parse(self, ins):
-        """ Parse an input stream containing an ant build.properties file. Return a
+        """Parse an input stream containing an ant build.properties file. Return a
         structured document represented by tree.Node
 
         @param ins - input stream
@@ -40,14 +41,14 @@ class BuildPropertiesParser(parser.Parser):
 
             if continued_line:
                 continued_line = False
-                value += x.strip("\"")
+                value += x.strip('"')
 
                 if len(value) and value[-1] == "\\":
                     value = value[:-1]
                     continued_line = True
                     continue
 
-                root.add_kid(Node(attrib,value))
+                root.add_kid(Node(attrib, value))
                 continue
 
             if len(x) == 0 or x[:1] == "#":
@@ -58,14 +59,14 @@ class BuildPropertiesParser(parser.Parser):
 
             if len(xs) > 1:
                 attrib = xs[0].strip()
-                value = xs[1].strip().strip("\"")
+                value = xs[1].strip().strip('"')
 
                 if value != "" and value[-1] == "\\":
                     value = value[:-1]
                     continued_line = True
                     continue
 
-                root.add_kid(Node(attrib,value))
+                root.add_kid(Node(attrib, value))
 
             else:
                 raise ParseError("Malformed line " + str(lineno))
@@ -77,5 +78,3 @@ class BuildPropertiesParser(parser.Parser):
 
     def wrapped_value(self, node):
         return node.output_value()
-
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:

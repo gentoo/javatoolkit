@@ -4,7 +4,8 @@
 #
 # Licensed under the GNU General Public License, v2
 
-def expand(root, expr, realroot = None):
+
+def expand(root, expr, realroot=None):
     """Evaluates a path expression on a given tree.
 
     @param root - the root of the tree
@@ -40,6 +41,7 @@ def expand(root, expr, realroot = None):
 
     return expanded
 
+
 def strip_varmarker(s):
     """Strips away ${ and } in a variable expression. Idempotent if marker not found.
 
@@ -51,5 +53,3 @@ def strip_varmarker(s):
         return s[2:-1]
 
     return s
-
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:

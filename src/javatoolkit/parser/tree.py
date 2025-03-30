@@ -15,6 +15,7 @@ class NodeIter:
     def __init__(self, node):
         self._node = node
         self._index = 0
+
     def __next__(self):
         self._index += 1
         if self._index >= len(self._node._kids):
@@ -23,7 +24,7 @@ class NodeIter:
 
 
 class Node:
-    def __init__(self, name = None, value = None):
+    def __init__(self, name=None, value=None):
         self.name = name
         self.value = value
         self._kids = []
@@ -45,7 +46,8 @@ class Node:
     """
     Dump self as text to stream.
     """
-    def dump(self, ous, indent = 0):
+
+    def dump(self, ous, indent=0):
         if self.name:
             ous.write((" " * indent) + self.name + " = " + self.value + "\n")
 
@@ -54,9 +56,17 @@ class Node:
     """
     Output self as text to stream using the given format.
     """
-    def output(self, ous, before, between, after, wrap = None, indent = ""):
+
+    def output(self, ous, before, between, after, wrap=None, indent=""):
         if self.name:
-            ous.write(before + self.name + between + self.output_value(wrap, indent) + after + "\n")
+            ous.write(
+                before
+                + self.name
+                + between
+                + self.output_value(wrap, indent)
+                + after
+                + "\n"
+            )
 
         for x in self._kids:
             x.output(ous, before, between, after, wrap, indent)
@@ -64,7 +74,8 @@ class Node:
     """
     Return node value as string using the given format.
     """
-    def output_value(self, wrap = None, indent = ""):
+
+    def output_value(self, wrap=None, indent=""):
         if wrap == None:
             return self.value
         else:
@@ -73,6 +84,7 @@ class Node:
     """
     Returns a lists of all the node names.
     """
+
     def node_names(self):
         names = []
 
@@ -92,6 +104,7 @@ class Node:
 
     @return reference to the found node, if any
     """
+
     def find_node(self, nodename):
         if self.name == nodename:
             return self
@@ -116,7 +129,8 @@ class Node:
 
     @return wrapped text
     """
-    def __wrap_outside_quotes(self, text, wrap, indent, pos = None):
+
+    def __wrap_outside_quotes(self, text, wrap, indent, pos=None):
         if pos == None:
             pos = len(text)
 
@@ -128,8 +142,13 @@ class Node:
         num_quotes = text.count('"', next_wrap, pos)
 
         if num_quotes % 2 != 0:
-            return self.__wrap_outside_quotes(text, wrap, indent, text.rfind('"', 0, next_wrap + 1))
+            return self.__wrap_outside_quotes(
+                text, wrap, indent, text.rfind('"', 0, next_wrap + 1)
+            )
 
-        return self.__wrap_outside_quotes(text[0:next_wrap] + wrap + "\n" + indent + text[next_wrap + 1:], wrap, indent, next_wrap)
-
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:
+        return self.__wrap_outside_quotes(
+            text[0:next_wrap] + wrap + "\n" + indent + text[next_wrap + 1 :],
+            wrap,
+            indent,
+            next_wrap,
+        )

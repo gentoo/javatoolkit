@@ -13,7 +13,7 @@ import xml.etree.cElementTree as et
 
 args = sys.argv[1:]
 if len(args) == 0:
-    args = ['build.xml']
+    args = ["build.xml"]
 
 
 def main():
@@ -23,24 +23,30 @@ def main():
 
         for elem in tree.getiterator():
             for child in list(elem):
-                if child.tag == 'taskdef' and child.get(
-                        'classname') == 'com.tonicsystems.jarjar.JarJarTask':
-                    tags.append(child.get('name'))
+                if (
+                    child.tag == "taskdef"
+                    and child.get("classname") == "com.tonicsystems.jarjar.JarJarTask"
+                ):
+                    tags.append(child.get("name"))
                     elem.remove(child)
 
         for tag in tags:
             for jarjar in tree.getiterator(tag):
-                if jarjar.get('destfile') or jarjar.get('jarfile'):
-                    jarjar.tag = 'jar'
-                    if jarjar.get('verbose'):
-                        del jarjar.attrib['verbose']
+                if jarjar.get("destfile") or jarjar.get("jarfile"):
+                    jarjar.tag = "jar"
+                    if jarjar.get("verbose"):
+                        del jarjar.attrib["verbose"]
                     for child in list(jarjar):
-                        if child.tag == 'keep' or child.tag == 'rule' or child.tag == 'zipfileset':
+                        if (
+                            child.tag == "keep"
+                            or child.tag == "rule"
+                            or child.tag == "zipfileset"
+                        ):
                             jarjar.remove(child)
 
-        with open(file, 'w') as f:
+        with open(file, "w") as f:
             tree.write(f)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

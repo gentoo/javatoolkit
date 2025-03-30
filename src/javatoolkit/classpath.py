@@ -6,6 +6,7 @@
 
 class ClasspathIter:
     """An iterator for the Classpath class, below."""
+
     def __init__(self, classpath):
         self._classpath = classpath
         self._index = 0
@@ -18,10 +19,11 @@ class ClasspathIter:
 
 
 class Classpath:
-    """A classpath object provides a collection interface to the elements of a : separated  path list. """
-    def __init__(self, classpath_string = None):
+    """A classpath object provides a collection interface to the elements of a : separated  path list."""
+
+    def __init__(self, classpath_string=None):
         if classpath_string != None:
-            cs = classpath_string.strip().strip("\"")
+            cs = classpath_string.strip().strip('"')
             self.classpath = cs.split(":")
         else:
             self.classpath = []
@@ -49,6 +51,3 @@ class Classpath:
     def append(self, element):
         """Appends an path to the classpath."""
         self.classpath.append(element)
-
-
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# vim: set ai ts=8 sts=0 sw=8 tw=0 noexpandtab:
 
 # Copyright 2004-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public Licence v2
@@ -33,7 +32,10 @@ def main():
     usage += "Usage:\n"
     usage += "  %s [-a] [-v] [-g] [-d] [-f fic.xml]\n" % sys.argv[0]
     usage += "Or:\n"
-    usage += "  %s --rewrite [--classpath some.jar:class.jar:path.jar] [--source JVM_VER ] |--target JVM_VER]\n" % sys.argv[0]
+    usage += (
+        "  %s --rewrite [--classpath some.jar:class.jar:path.jar] [--source JVM_VER ] |--target JVM_VER]\n"
+        % sys.argv[0]
+    )
     usage += "    JVM_VER ::= 1.4 || 1.5 "
     usage += "\n"
     usage += "If the -f parameter is not utilized, the script will read and\n"
@@ -48,18 +50,25 @@ def main():
         pom = MavenPom(options)
         if options.p_rewrite:
             pom.parse(stream, pom.rewrite)
-        elif options.p_ischild or options.p_group or options.p_dep or options.p_artifact or options.p_version:
+        elif (
+            options.p_ischild
+            or options.p_group
+            or options.p_dep
+            or options.p_artifact
+            or options.p_version
+        ):
             pom.parse(stream, pom.getDescription)
         return pom
 
     def run():
         if options.files:
             import os
+
             for file in options.files:
                 # First parse the file into memory
                 cwd = os.getcwd()
                 dirname = os.path.dirname(file)
-                if dirname != '':  # for file  comes out as ''
+                if dirname != "":  # for file  comes out as ''
                     os.chdir(os.path.dirname(file))
 
                 f = open(os.path.basename(file), "r")
@@ -79,76 +88,92 @@ def main():
             pom = doAction(sys.stdin.read(), options)
             print(pom.read())
 
-
-############### MAIN ###############
+    ############### MAIN ###############
     options_list = [
         make_option(
             "-a",
             "--artifact",
             action="store_true",
             dest="p_artifact",
-            help="get artifact name."),
+            help="get artifact name.",
+        ),
         make_option(
             "-c",
             "--classpath",
             action="append",
             dest="classpath",
-            help="set classpath to use with maven."),
+            help="set classpath to use with maven.",
+        ),
         make_option(
             "-s",
             "--source",
             action="append",
             dest="p_source",
-            help="Java source version."),
+            help="Java source version.",
+        ),
         make_option(
             "-t",
             "--target",
             action="append",
             dest="p_target",
-            help="Java target version."),
+            help="Java target version.",
+        ),
         make_option(
             "-d",
             "--depependencies",
             action="store_true",
             dest="p_dep",
-            help="get dependencies infos"),
+            help="get dependencies infos",
+        ),
         make_option(
             "-f",
             "--file",
             action="append",
             dest="files",
-            help="Transform files instead of operating on stdout and stdin"),
+            help="Transform files instead of operating on stdout and stdin",
+        ),
         make_option(
             "-g",
             "--group",
             action="store_true",
             dest="p_group",
-            help="get artifact group."),
+            help="get artifact group.",
+        ),
         make_option(
             "-r",
             "--rewrite",
             action="store_true",
             dest="p_rewrite",
-            help="rewrite poms to use our classpath"),
+            help="rewrite poms to use our classpath",
+        ),
         make_option(
             "-p",
             "--ischild",
             action="store_true",
             dest="p_ischild",
-            help="return true if this is a child pom"),
+            help="return true if this is a child pom",
+        ),
         make_option(
             "-v",
             "--version",
             action="store_true",
             dest="p_version",
-            help="get artifact version."),
+            help="get artifact version.",
+        ),
     ]
 
     parser = OptionParser(usage, options_list)
     (options, args) = parser.parse_args()
 
     # Invalid Arguments Must be smited!
-    if not options.p_ischild and not options.p_rewrite and not options.p_dep and not options.p_version and not options.p_artifact and not options.p_group:
+    if (
+        not options.p_ischild
+        and not options.p_rewrite
+        and not options.p_dep
+        and not options.p_version
+        and not options.p_artifact
+        and not options.p_group
+    ):
         print(usage)
         print()
         error("No action was specified.")
@@ -185,5 +210,5 @@ def main():
     run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -22,5 +22,3 @@ def einfo(s):
 def die(err, s):
     eerror(s)
     sys.exit(err)
-
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap:
