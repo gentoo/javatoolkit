@@ -24,3 +24,10 @@ jobs:
 
       - name: Run tests
         run: python -m unittest discover -t src -s test
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - uses: psf/black@24.10.0
