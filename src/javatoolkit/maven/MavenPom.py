@@ -28,7 +28,7 @@ class MavenPom:
         self.version = ""
         self.name = ""
         self.is_child = "false"
-        self.dependencies = []
+        self.dependencies: list[MavenPom] = []
         self.buffer = io.StringIO()
         self.__write = self.buffer.write
         self.mydoc = None
@@ -36,20 +36,20 @@ class MavenPom:
 
     def getInfos(self, node):
         for child_node in node.childNodes:
-            if child_node.nodeType == child_node.ELEMENT_NODE:
-                if child_node.childNodes:
-                    if child_node.childNodes[0].nodeValue != "":
-                        if child_node.nodeName == "version":
-                            self.version = child_node.childNodes[0].nodeValue
-
-                        if child_node.nodeName == "artifactId":
-                            self.artifact = child_node.childNodes[0].nodeValue
-
-                        if child_node.nodeName == "groupId":
-                            self.group = child_node.childNodes[0].nodeValue
-
-                        if child_node.nodeName == "name":
-                            self.name = child_node.childNodes[0].nodeValue
+            if (
+                child_node.nodeType == child_node.ELEMENT_NODE
+                and child_node.childNodes
+                and (value := child_node.childNodes.nodeValue) != ""
+            ):
+                match child_node.nodeName:
+                    case "version":
+                        self.version = value
+                    case "artifactId":
+                        self.artifact = value
+                    case "groupId":
+                        self.group = value
+                    case "name":
+                        self.name = value
 
     def getDescription(self, mydoc, **kwargs):
         if mydoc:

@@ -6,7 +6,7 @@
 import sys
 
 
-class ParseError:
+class ParseError(Exception):
     def __init__(self, error):
         self.error = error
 

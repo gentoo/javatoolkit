@@ -74,7 +74,7 @@ def main():
         with open(options.output, "w") as output:
             output.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
             output.write(
-                '<project basedir="." default="jar" name="' + options.project + '">\n'
+                f'<project basedir="." default="jar" name="{options.project}">\n'
             )
             output.write('<property name="target" value="1.4"/>\n')
             output.write('<property name="source" value="1.4"/>\n')
@@ -83,30 +83,24 @@ def main():
             output.write('<mkdir dir="bin"/>\n')
             output.write('<copy includeemptydirs="false" todir="bin">\n')
             try:
-                if properties.config["source.."]:
-                    for dir in properties.config["source.."]:
-                        output.write(
-                            '<fileset dir="'
-                            + dir
-                            + '" excludes="**/*.java, **/*.launch" />\n'
-                        )
-                if properties.config["bin.includes"]:
-                    for item in properties.config["bin.includes"]:
-                        if item != ".":
-                            if item.endswith("/"):
-                                item = item.rstrip("/")
-                                output.write(
-                                    '<fileset dir="." includes="'
-                                    + item
-                                    + '/**" excludes="**/*.java, **/*.launch" />\n'
-                                )
-                            else:
-                                output.write('<fileset file="' + item + '" />\n')
+                for dir in properties.config.get("source..", ()):
+                    output.write(
+                        f'<fileset dir="{dir}" excludes="**/*.java, **/*.launch" />\n'
+                    )
+                for item in properties.config.get("bin.includes", ()):
+                    if item != ".":
+                        if item.endswith("/"):
+                            item = item.rstrip("/")
+                            output.write(
+                                f'<fileset dir="." includes="{item}/**" excludes="**/*.java, **/*.launch" />\n'
+                            )
+                        else:
+                            output.write(f'<fileset file="{item}" />\n')
             finally:
                 output.write("</copy>\n")
             if options.includes:
                 for file in options.includes:
-                    output.write('<copy file="' + file + '" todir="bin"/>')
+                    output.write(f'<copy file="{file}" todir="bin"/>')
             output.write("</target>\n")
             output.write(
                 '\n<target name="clean">\n\t<delete dir="bin"/>\n</target>\n\n'
@@ -118,14 +112,14 @@ def main():
             try:
                 if properties.config["source.."]:
                     for dir in properties.config["source.."]:
-                        output.write('\t<src path="' + dir + '" />\n')
+                        output.write(f'\t<src path="{dir}" />\n')
             finally:
                 output.write("</javac>\n")
             output.write("</target>\n\n")
             output.write('<target depends="compile" name="jar" >\n')
             output.write('<jar file="${ant.project.name}.jar" basedir="bin"')
             if options.manifest:
-                output.write('\nmanifest="' + parser.manifest + '">\n')
+                output.write(f'\nmanifest="{parser.manifest}">\n')
             else:
                 output.write(">\n")
             output.write("</jar>\n")

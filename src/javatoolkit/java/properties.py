@@ -8,12 +8,12 @@ class PropertiesParser:
     Parse eclipse projects build.properties file.
     """
 
-    def __init__(self, file):
+    def __init__(self, file: str):
         self.file = file
-        self.config = {}
+        self.config: dict[str, list[str]] = {}
         self.parse(file)
 
-    def parse(self, file):
+    def parse(self, file: str):
         if not os.path.isfile(file):
             return
         if not os.access(file, os.R_OK):
