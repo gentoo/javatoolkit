@@ -1,4 +1,4 @@
-0.6.9 (??)
+0.6.9 (12 Aug 2025)
 - Prevent failure when MANIFEST.MF isn't UTF-8 encoded (bug #952052)
 
 0.6.8 (08 Mar 2025)
